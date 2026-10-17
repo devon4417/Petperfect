@@ -1,11 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/adminAuth";
 
-// GET /api/admin/orders — list orders newest first.
-// MVP: no auth. Add authentication before any production use.
-export async function GET() {
+// GET /api/admin/orders — list orders newest first. Requires admin session.
+export async function GET(req: NextRequest) {
+  if (!isAdminRequest(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const sb = getSupabaseAdmin();
   const { data, error } = await sb
     .from("orders")

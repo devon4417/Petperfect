@@ -3,11 +3,14 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/adminAuth";
 
 // POST /api/admin/capture — capture an authorized payment when the supplier
-// order ships. Body: { order_id: string }.
-// MVP: no auth. Add authentication before any production use.
+// order ships. Body: { order_id: string }. Requires admin session.
 export async function POST(req: NextRequest) {
+  if (!isAdminRequest(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { order_id } = await req.json();
     if (!order_id) {
