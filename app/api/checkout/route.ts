@@ -37,8 +37,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    // Derive the public app URL from the request so Stripe redirects back
+    // to this deployment (Vercel sets x-forwarded-* headers).
+    const host =
+      req.headers.get("x-forwarded-host") ??
+      req.headers.get("host") ??
+      "localhost:3000";
+    const proto = req.headers.get("x-forwarded-proto") ?? "https";
+    const appUrl = `${proto}://${host}`;
     const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
