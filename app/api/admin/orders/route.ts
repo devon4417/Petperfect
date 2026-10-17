@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
     .limit(100);
 
   if (error) {
-    return NextResponse.json({ error: "Could not load orders" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Could not load orders", detail: JSON.stringify(error).slice(0, 300) },
+      { status: 500 }
+    );
   }
   return NextResponse.json({ orders: data });
 }
