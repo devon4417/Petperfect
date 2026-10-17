@@ -17,8 +17,14 @@ export async function GET(req: NextRequest) {
     .limit(100);
 
   if (error) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const ref = url.replace("https://", "").split(".")[0];
     return NextResponse.json(
-      { error: "Could not load orders", detail: JSON.stringify(error).slice(0, 300) },
+      {
+        error: "Could not load orders",
+        detail: JSON.stringify(error).slice(0, 200),
+        dbRef: ref,
+      },
       { status: 500 }
     );
   }
